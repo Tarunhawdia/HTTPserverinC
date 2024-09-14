@@ -20,7 +20,8 @@
 
 int main() {
     int server_fd;
-    struct sockaddr_in server_addr;
+    struct sockaddr_in server_addr , client_addr;
+    socklen_t client_len = sizeof(client_addr);
     int port=8080;
 
     //int socket(int domain, int type, int protocol);
@@ -50,7 +51,16 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    printf("Socket is listining on port %d \n", port);
+    // Accept incoming connection
+    int accRes = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
+    if (accRes == -1) {
+        perror("Failed to accept");
+        exit(EXIT_FAILURE);
+    } else {
+        printf("Client has connected\n");
+    }
+
+    printf("Socket is listening on port %d\n", port);
 
     return 0;
 }
