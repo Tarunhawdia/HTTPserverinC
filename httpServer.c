@@ -5,6 +5,10 @@
 #include <arpa/inet.h>  // for socket functions
 #include <sys/socket.h>
 #include <sys/types.h>
+
+#define LISTEN_BACKLOG 50
+
+
 //Here are the basic steps we'll follow:
 
 //Create a socket.
@@ -41,7 +45,12 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    printf("Socket bound to port %d successfully!\n", port);
+    if(listen(server_fd,LISTEN_BACKLOG)==-1){
+        perror("Failed to listen");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Socket is listining on port %d \n", port);
 
     return 0;
 }
