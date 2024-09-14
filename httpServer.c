@@ -1,30 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>  // for close() function
-#include <arpa/inet.h>  // for socket functions
+#include <unistd.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
 #define LISTEN_BACKLOG 50
 
-
-//Here are the basic steps we'll follow:
-
-//Create a socket.
-//Bind it to an IP address and port.
-//Listen for incoming connections.
-//Accept connections.
-//Send a basic HTTP response.
-//Close the connection.
-
 int main() {
     int server_fd;
-    struct sockaddr_in server_addr , client_addr;
+    struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
-    int port=8080;
+    int port = 8080;
 
-    //int socket(int domain, int type, int protocol);
     // Create a TCP socket
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd == -1) {
@@ -33,23 +22,24 @@ int main() {
     }
 
     // Define the server address
-    server_addr.sin_family = AF_INET;  // IPv4
-    server_addr.sin_addr.s_addr = INADDR_ANY;  // Listen on any available network interface
-    server_addr.sin_port = htons(port);  // Convert port number to network byte order
+    server_addr.sin_family = AF_INET;  
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(port); 
 
-
-    // Bind the socket to the specified IP and port
-    // 0 on sucess -1 on error
+    // Bind the socket
     if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
         perror("Failed to bind socket");
         close(server_fd);
         exit(EXIT_FAILURE);
     }
 
-    if(listen(server_fd,LISTEN_BACKLOG)==-1){
+    // Listen for incoming connections
+    if (listen(server_fd, LISTEN_BACKLOG) == -1) {
         perror("Failed to listen");
         exit(EXIT_FAILURE);
     }
+
+    printf("Socket is listening on port %d\n", port);
 
     // Accept incoming connection
     int accRes = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
@@ -58,9 +48,24 @@ int main() {
         exit(EXIT_FAILURE);
     } else {
         printf("Client has connected\n");
+
+        // Prepare HTTP response
+        char message[] = 
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/plain\r\n"
+            "Content-Length: 12\r\n"
+            "\r\n"
+            "Hello world!";
+
+        // Send the HTTP response to the client
+        send(accRes, message, strlen(message), 0);
+
+        // Close the client connection
+        close(accRes);
     }
 
-    printf("Socket is listening on port %d\n", port);
+    // Keep the server socket open to listen for more connections
+    close(server_fd);
 
     return 0;
 }
