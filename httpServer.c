@@ -50,12 +50,7 @@ int main() {
         printf("Client has connected\n");
 
         // Prepare HTTP response
-        char message[] = 
-            "HTTP/1.1 200 OK\r\n"
-            "Content-Type: text/plain\r\n"
-            "Content-Length: 12\r\n"
-            "\r\n"
-            "Hello world!";
+        char message[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 12\r\n\r\nHello world!";
 
         // Send the HTTP response to the client
         send(accRes, message, strlen(message), 0);
