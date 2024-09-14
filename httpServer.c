@@ -4,7 +4,7 @@
 #include <unistd.h>  // for close() function
 #include <arpa/inet.h>  // for socket functions
 #include <sys/socket.h>
-
+#include <sys/types.h>
 //Here are the basic steps we'll follow:
 
 //Create a socket.
@@ -16,7 +16,9 @@
 
 int main() {
     int server_fd;
-    
+    struct sockaddr_in server_addr;
+    int port=8080;
+
     //int socket(int domain, int type, int protocol);
     // Create a TCP socket
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -24,8 +26,22 @@ int main() {
         perror("Failed to create socket");
         exit(EXIT_FAILURE);
     }
-    
-    printf("Socket created successfully!\n");
+
+    // Define the server address
+    server_addr.sin_family = AF_INET;  // IPv4
+    server_addr.sin_addr.s_addr = INADDR_ANY;  // Listen on any available network interface
+    server_addr.sin_port = htons(port);  // Convert port number to network byte order
+
+
+    // Bind the socket to the specified IP and port
+    // 0 on sucess -1 on error
+    if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+        perror("Failed to bind socket");
+        close(server_fd);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Socket bound to port %d successfully!\n", port);
 
     return 0;
 }
