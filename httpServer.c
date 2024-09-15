@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <arpa/inet.h>
+#include <unistd.h>  // for close() function
+#include <arpa/inet.h>  // for socket functions
 #include <sys/socket.h>
 #include <sys/types.h>
 
@@ -57,6 +57,7 @@ int main() {
 
         // Close the client connection
         close(accRes);
+        printf("Client connection closed\n");
     }
 
     // Keep the server socket open to listen for more connections
